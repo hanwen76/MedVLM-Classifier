@@ -1,0 +1,2 @@
+{"image": "examples/images/demo_eczema.jpg", "label": "湿疹", "split": "valid"}
+{"image": "examples/images/demo_psoriasis.jpg", "label": "银屑病", "split": "valid"}

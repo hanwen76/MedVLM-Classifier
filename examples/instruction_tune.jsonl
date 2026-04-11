@@ -1,0 +1,2 @@
+{"image": "demo_eczema.jpg", "text": "USER: <image>\\n请描述这张皮肤病图像。\\nASSISTANT: 图像显示红斑与轻度鳞屑，建议结合临床检查。"}
+{"image": "demo_psoriasis.jpg", "text": "USER: <image>\\n请指出可见病理特征。\\nASSISTANT: 可见边界较清晰的红斑与银白色鳞屑。"}

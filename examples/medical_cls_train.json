@@ -1,0 +1,4 @@
+[
+  {"image": "demo_eczema.jpg", "label": "湿疹"},
+  {"image": "demo_psoriasis.jpg", "label": "银屑病"}
+]
