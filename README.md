@@ -261,3 +261,4 @@ ASSISTANT:
 - 示例中的 `examples/images/*.jpg` 仅作占位，请替换为真实图像。
 - 大模型训练建议启用 GPU，并按显存调整 `batch_size/max_length`。
 - 本项目是框架骨架，可继续接入 LoRA、DeepSpeed、分布式训练等能力。
+# MedVLM-Classifier
