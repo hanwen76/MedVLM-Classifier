@@ -155,6 +155,77 @@ python scripts/benchmark_medmnist_zeroshot.py \
 - `outputs/medmnist_zeroshot/*summary.json`
 - `outputs/medmnist_zeroshot/leaderboard.json`
 
+### CLIP 零微调分类基线
+
+使用 CLIP 图文相似度做闭域 zero-shot 分类：
+
+```bash
+python scripts/benchmark_clip_zeroshot.py \
+  --clip_model openai/clip-vit-large-patch14 \
+  --data_json data/isic2019/test.json \
+  --image_root data/isic2019/raw \
+  --labels_json data/isic2019/labels.json \
+  --prompt_template "a dermoscopic image of {label}" \
+  --batch_size 32 \
+  --output_dir outputs/isic2019_clip_zeroshot
+```
+
+输出包含：
+
+- `outputs/isic2019_clip_zeroshot/predictions.jsonl`
+- `outputs/isic2019_clip_zeroshot/summary.json`
+
+`summary.json` 会报告 `exact_match_accuracy`、`macro_f1`、`ambiguity_rate` 等严格分类指标。
+
+### ISIC 2019 下载与预处理
+
+官方数据页：
+
+- [ISIC Challenge 2019](https://challenge.isic-archive.com/landing/2019/)
+- [ISIC Challenge Data](https://challenge.isic-archive.com/data/)
+
+可直接下载官方文件：
+
+```bash
+mkdir -p data/isic2019/downloads
+cd data/isic2019/downloads
+
+wget -O ISIC_2019_Training_Input.zip \
+  https://isic-archive.s3.amazonaws.com/challenges/2019/ISIC_2019_Training_Input.zip
+wget -O ISIC_2019_Training_GroundTruth.csv \
+  https://isic-archive.s3.amazonaws.com/challenges/2019/ISIC_2019_Training_GroundTruth.csv
+wget -O ISIC_2019_Test_Input.zip \
+  https://isic-archive.s3.amazonaws.com/challenges/2019/ISIC_2019_Test_Input.zip
+wget -O ISIC_2019_Test_GroundTruth.csv \
+  https://isic-archive.s3.amazonaws.com/challenges/2019/ISIC_2019_Test_GroundTruth.csv
+```
+
+转换为本项目可直接读取的格式：
+
+```bash
+python scripts/prepare_isic2019.py \
+  --train_input data/isic2019/downloads/ISIC_2019_Training_Input.zip \
+  --train_gt data/isic2019/downloads/ISIC_2019_Training_GroundTruth.csv \
+  --test_input data/isic2019/downloads/ISIC_2019_Test_Input.zip \
+  --test_gt data/isic2019/downloads/ISIC_2019_Test_GroundTruth.csv \
+  --output_root data/isic2019 \
+  --label_style full
+```
+
+输出结构：
+
+- `data/isic2019/train.json`
+- `data/isic2019/val.json`
+- `data/isic2019/test.json`
+- `data/isic2019/labels.json`
+- `data/isic2019/raw/`
+
+说明：
+
+- 默认会从官方训练集里按类别分层切出 `val.json`
+- 默认会丢弃官方测试集中的 `UNK` 类，以匹配当前项目的闭域分类设定
+- 如果你要保留 `UNK` 做开放集分析，可加 `--keep_unknown_test`
+
 ## 4. 训练（默认只训练 Projector）
 
 ```bash
@@ -198,6 +269,23 @@ bash scripts/run_medmnist_multi_dataset.sh \
 
 - `outputs/medmnist_multiset/<dataset>/checkpoint/`
 - `outputs/medmnist_multiset/<dataset>/eval_closed_world.json`
+
+### ISIC 2019 训练+评估
+
+```bash
+bash scripts/run_isic2019.sh \
+  --model_name_or_path /path/to/llava-or-qwen-vl \
+  --instruction_jsonl /path/to/instruction.jsonl \
+  --instruction_image_root /path/to/instruction_images \
+  --isic_root data/isic2019 \
+  --output_dir outputs/isic2019
+```
+
+默认读取：
+
+- `data/isic2019/train.json`
+- `data/isic2019/test.json`
+- `data/isic2019/raw/`
 
 ## 5. 闭域分类评估
 

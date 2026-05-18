@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 from medvlm_classifier.data import MedicalClassificationEvalDataset, PromptTemplateConfig
 from medvlm_classifier.eval import compute_closed_world_accuracy
+from medvlm_classifier.eval.classification_metrics import extract_label
 from medvlm_classifier.model import load_vlm_and_processor
 
 
@@ -127,10 +128,17 @@ def run() -> None:
                 print(f"[eval] processed_batches={i} processed_samples={len(references)}")
 
     metrics = compute_closed_world_accuracy(predictions, references)
+    labels = metrics.get("labels", sorted(set(references)))
     out = {
         "metrics": metrics,
         "samples": [
-            {"prediction": p, "reference": r, "is_correct": normalize_ref_in_pred(p, r)}
+            {
+                "prediction": p,
+                "reference": r,
+                "pred_label": extract_label(p, labels),
+                "is_correct": extract_label(p, labels) == r,
+                "is_inclusion_correct": normalize_ref_in_pred(p, r),
+            }
             for p, r in zip(predictions, references)
         ],
     }
